@@ -1,4 +1,5 @@
 buildscript {
+
 	repositories {
 		jcenter()
 	}
@@ -14,6 +15,7 @@ application {
 }
 
 allprojects {
+
 	repositories {
 		jcenter()
 	}
@@ -26,9 +28,11 @@ dependencies {
 }
 
 jar {
+
 	manifest {
 		attributes 'Main-Class': mainClassName
 	}
+
 	from configurations.compileClasspath.collect {
 		it.isDirectory() || !it.exists() ? it : zipTree(it)
 	}

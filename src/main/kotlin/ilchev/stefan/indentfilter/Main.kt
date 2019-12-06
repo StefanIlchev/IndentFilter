@@ -6,7 +6,6 @@ import ilchev.stefan.utils.thisJar
 import ilchev.stefan.utils.thisWorkspace
 import java.io.File
 import java.nio.file.Files
-import java.util.*
 
 const val SWITCH_SMUDGE_TYPE = "smudge-type"
 
@@ -78,12 +77,12 @@ fun mainGitConfig(args: Array<String>) {
 		|[merge]
 		|	renormalize = true"""
 			.trimMargin()
-	System.out.println(config)
-	System.out.println()
+	println(config)
+	println()
 	val attributes = """.git/info/attributes:
 		|* filter=${thisWorkspace.name}"""
 			.trimMargin()
-	System.out.println(attributes)
+	println(attributes)
 }
 
 fun mainGitSmudge(args: Array<String>) {
@@ -109,7 +108,7 @@ fun mainDebug(args: Array<String>, error: Throwable?) {
 	val writer = File(path)
 			.printWriter()
 	writer.use {
-		val argsString = Arrays.toString(args)
+		val argsString = args.contentToString()
 		it.println(argsString)
 		error?.printStackTrace(it)
 	}

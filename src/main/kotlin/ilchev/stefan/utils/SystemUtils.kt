@@ -14,10 +14,11 @@ fun start(command: String,
 			.start()
 }
 
-fun findMimeType(path: String): String {
-	val process = start("""file -b --mime-type "$path"""")
-	process.waitFor()
-	return process.inputStream
-			.bufferedReader()
-			.readText()
-}
+fun execute(command: String,
+		directory: File = File(".")) = start(command, directory)
+		.apply { waitFor() }
+		.inputStream
+		.bufferedReader()
+		.use { it.readText() }
+
+fun findMimeType(path: String) = execute("""file -b --mime-type "$path"""")

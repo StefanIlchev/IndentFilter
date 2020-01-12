@@ -21,7 +21,7 @@ fun execute(command: String,
 	val result = process.inputStream
 			.bufferedReader()
 			.use { it.readText() }
-	return if (exitValue == 0) result else throw Exception(result)
+	return if (exitValue == 0) result else throw Exception("exitValue = $exitValue\n$result")
 }
 
 fun findMimeType(path: String) = execute("""file -b --mime-type "$path"""")

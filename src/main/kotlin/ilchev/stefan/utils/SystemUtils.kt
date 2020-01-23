@@ -2,6 +2,10 @@ package ilchev.stefan.utils
 
 import java.io.File
 
+val lineSeparator: String = System.lineSeparator()
+
+val terminal = if (System.getProperty("os.name").startsWith("Windows")) "cmd /c" else "bash"
+
 fun start(command: String,
 		directory: File = File(".")): Process {
 	val regex = Regex("""\s(?=(?:[^"]*["][^"]*["])*[^"]*$)""")
@@ -22,9 +26,11 @@ fun execute(command: String,
 			.bufferedReader()
 			.use { it.readText() }
 	if (exitValue != 0) {
-		throw Exception("exitValue = $exitValue${System.lineSeparator()}$result")
+		throw Exception("exitValue = $exitValue$lineSeparator$result")
 	}
 	return result
 }
 
-fun findMimeType(path: String) = execute("""file -b --mime-type "$path"""")
+fun executeTerminal(command: String) = execute("$terminal $command")
+
+fun findMimeType(path: String) = executeTerminal("""file -b --mime-type "$path"""")

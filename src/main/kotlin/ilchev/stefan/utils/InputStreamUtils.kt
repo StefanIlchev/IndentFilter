@@ -8,7 +8,7 @@ fun InputStream.copyToStorage(repo: String,
 		path: String): File {
 	val file = File("$repo/$type/$path")
 	file.parentFile
-			.mkdirs()
+			?.mkdirs()
 	file.outputStream().use {
 		copyTo(it)
 	}

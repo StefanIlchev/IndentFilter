@@ -4,33 +4,45 @@ import java.io.File
 
 val lineSeparator: String = System.lineSeparator()
 
-val terminal = if (System.getProperty("os.name").startsWith("Windows")) "cmd /c" else "bash"
+val isWindows = System.getProperty("os.name").startsWith("Windows")
 
-fun start(command: String,
-		directory: File = File(".")): Process {
-	val regex = Regex("""\s(?=(?:[^"]*["][^"]*["])*[^"]*$)""")
-	val parts = command.split(regex)
-			.toTypedArray()
-	return ProcessBuilder(*parts)
-			.directory(directory)
-			.redirectOutput(ProcessBuilder.Redirect.PIPE)
-			.redirectError(ProcessBuilder.Redirect.PIPE)
-			.start()
+fun createProcessBuilder(command: Array<String>, directory: File = File(".")) = ProcessBuilder(*command).apply {
+	directory(directory)
+	redirectOutput(ProcessBuilder.Redirect.PIPE)
+	redirectError(ProcessBuilder.Redirect.PIPE)
 }
 
-fun execute(command: String,
-		directory: File = File(".")): String {
-	val process = start(command, directory)
-	val exitValue = process.waitFor()
-	val result = process.inputStream
+fun createProcessBuilder(command: String, directory: File = File(".")): ProcessBuilder {
+	val regex = Regex("""\s(?=(?:[^"]*["][^"]*["])*[^"]*$)""")
+	val parts = command.split(regex).toTypedArray()
+	return createProcessBuilder(parts, directory)
+}
+
+fun ProcessBuilder.execute(): String = start().run {
+	val exitValue = waitFor()
+	val result = inputStream
 			.bufferedReader()
 			.use { it.readText() }
-	if (exitValue != 0) {
-		throw Exception("exitValue = $exitValue$lineSeparator$result")
-	}
-	return result
+	if (exitValue == 0) result else throw Exception("exitValue = $exitValue$lineSeparator$result")
 }
 
-fun executeTerminal(command: String) = execute("$terminal $command")
+fun ProcessBuilder.execute(retriesCount: Int): String {
+	var throwable: Throwable? = null
+	for (attempt in 0..retriesCount) {
+		try {
+			return execute()
+		} catch (t: Throwable) {
+			throwable?.also { t.addSuppressed(it) }
+			throwable = t
+		}
+	}
+	throw throwable!!
+}
+
+fun executeTerminal(command: String, retriesCount: Int = 0) = if (isWindows) {
+	createProcessBuilder("cmd /c $command")
+} else {
+	createProcessBuilder(arrayOf("bash", "-c", command))
+}.execute(retriesCount)
 
 fun findMimeType(path: String) = executeTerminal("""file -b --mime-type "$path"""")

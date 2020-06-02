@@ -6,17 +6,10 @@ val lineSeparator: String = System.lineSeparator()
 
 val isWindows = System.getProperty("os.name").startsWith("Windows")
 
-private val splitCommandRegex by lazy { Regex("""\s(?=(?:[^"]*["][^"]*["])*[^"]*$)""") }
-
 fun createProcessBuilder(command: Array<String>, directory: File = File(".")) = ProcessBuilder(*command).apply {
 	directory(directory)
 	redirectOutput(ProcessBuilder.Redirect.PIPE)
 	redirectError(ProcessBuilder.Redirect.PIPE)
-}
-
-fun createProcessBuilder(command: String, directory: File = File(".")): ProcessBuilder {
-	val parts = command.split(splitCommandRegex).toTypedArray()
-	return createProcessBuilder(parts, directory)
 }
 
 fun ProcessBuilder.execute(): String = start().run {
@@ -41,7 +34,7 @@ fun ProcessBuilder.execute(retriesCount: Int): String {
 }
 
 fun executeTerminal(command: String, retriesCount: Int = 0) = if (isWindows) {
-	createProcessBuilder("cmd /c $command")
+	createProcessBuilder(arrayOf("cmd", "/c", command))
 } else {
 	createProcessBuilder(arrayOf("bash", "-c", command))
 }.execute(retriesCount)

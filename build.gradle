@@ -1,13 +1,13 @@
 buildscript {
 
 	repositories {
-		jcenter()
+		mavenCentral()
 	}
 }
 
 plugins {
 	id 'application'
-	id 'org.jetbrains.kotlin.jvm' version '1.4.31'
+	id 'org.jetbrains.kotlin.jvm' version '1.5.0'
 }
 
 application {
@@ -17,14 +17,14 @@ application {
 allprojects {
 
 	repositories {
-		jcenter()
+		mavenCentral()
 	}
 }
 
 dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 	implementation 'com.googlecode.java-diff-utils:diffutils:1.3.0'
-	testImplementation 'junit:junit:4.12'
+	testImplementation 'junit:junit:4.13.2'
 }
 
 jar {
